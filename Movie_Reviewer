@@ -1,146 +1,202 @@
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.InputMismatchException;
 
 class Movie {
-    String title;
+    String name;
     String director;
     int releaseYear;
-    double rating;
     String review;
-    boolean inWatchlist;
-    Date watchedDate;
+    int rating;
 
-    public Movie(String title, String director, int releaseYear, double rating, String review, boolean inWatchlist, Date watchedDate) {
-        this.title = title;
+    Movie(String name, String director, int releaseYear, String review, int rating) {
+        this.name = name;
         this.director = director;
         this.releaseYear = releaseYear;
-        this.rating = rating;
         this.review = review;
-        this.inWatchlist = inWatchlist;
-        this.watchedDate = watchedDate;
-    }
-}
-
-class MovieLogger {
-    List<Movie> movieList;
-    List<Movie> watchlist;
-    List<Movie> record;
-
-    public MovieLogger() {
-        movieList = new ArrayList<>();
-        watchlist = new ArrayList<>();
-        record = new ArrayList<>();
-    }
-
-    public void addMovie(String title, String director, int releaseYear, double rating, String review, boolean inWatchlist, Date watchedDate) {
-        Movie movie = new Movie(title, director, releaseYear, rating, review, inWatchlist, watchedDate);
-        movieList.add(movie);
-
-        if (inWatchlist) {
-            watchlist.add(movie);
-        }
-
-        record.add(movie);
-        System.out.println("Movie added successfully!");
-    }
-
-    public void listMovies() {
-        if (movieList.isEmpty()) {
-            System.out.println("No movies added yet.");
-        } else {
-            System.out.println("Movie List:");
-            for (Movie movie : movieList) {
-                System.out.println("Title: " + movie.title +
-                        ", Director: " + movie.director +
-                        ", Release Year: " + movie.releaseYear +
-                        ", Rating: " + movie.rating +
-                        "/5, Review: " + movie.review);
-                        
-            }
-        }
-    }
-
-    public void displayRecord() {
-        if (record.isEmpty()) {
-            System.out.println("No movies in the record yet.");
-        } else {
-            System.out.println("Movie Record:");
-            for (Movie movie : record) {
-                System.out.println("Title: " + movie.title +
-                        ", Director: " + movie.director +
-                        ", Release Year: " + movie.releaseYear +
-                        ", Rating: " + movie.rating +
-                        "/5, Review: " + movie.review +
-                        ", In Watchlist: " + (movie.inWatchlist ? "Yes" : "No") +
-                        (movie.inWatchlist ? ", Watched Date: " + formatDate(movie.watchedDate) : ""));
-            }
-        }
-    }
-
-    private String formatDate(Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        return dateFormat.format(date);
+        this.rating = rating;
     }
 }
 
 class MovieApp {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        MovieLogger movieLogger = new MovieLogger();
+    private ArrayList<Movie> shelf = new ArrayList<>();
+    private ArrayList<Movie> diary = new ArrayList<>();
+    private ArrayList<String> watchlist = new ArrayList<>();
+    private Map<String, Integer> watchlistIndexMap = new HashMap<>();
+    private Scanner scanner = new Scanner(System.in);
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
+    public static void main(String[] args) {
+        MovieApp movieApp = new MovieApp();
+        movieApp.run();
+    }
+
+    private void run() {
         while (true) {
-            System.out.println("\n1. Add Movie\n2. List Movies\n3. Display Record\n4. Exit");
-            System.out.print("Enter your choice: ");
+            System.out.println("\n1. Add to Shelf");
+            System.out.println("2. Add to Diary");
+            System.out.println("3. Add to Watchlist");
+            System.out.println("4. Shelf");
+            System.out.println("5. Diary");
+            System.out.println("6. Watchlist");
+            System.out.println("7. Exit");
+
+            System.out.print("Select an option: ");
             int choice = scanner.nextInt();
+            scanner.nextLine(); 
 
             switch (choice) {
                 case 1:
-                    System.out.print("Enter movie title: ");
-                    String title = scanner.next();
-                    System.out.print("Enter director: ");
-                    String director = scanner.next();
-                    System.out.print("Enter release year: ");
-                    int releaseYear = scanner.nextInt();
-                    System.out.print("Enter rating (out of 5): ");
-                    double rating = scanner.nextDouble();
-                    System.out.print("Enter review: ");
-                    String review = scanner.next();
-                    System.out.print("Is it in the watchlist? (true/false): ");
-                    boolean inWatchlist = scanner.nextBoolean();
-                    Date watchedDate = null;
-                    if (inWatchlist) {
-                        System.out.print("Enter the watched date (MM/dd/yyyy): ");
-                        try {
-                            watchedDate = new SimpleDateFormat("MM/dd/yyyy").parse(scanner.next());
-                        } catch (Exception e) {
-                            System.out.println("Invalid date format. Movie added without watched date.");
-                        }
-                    }
-
-                    movieLogger.addMovie(title, director, releaseYear, rating, review, inWatchlist, watchedDate);
+                    addToShelf();
                     break;
-
                 case 2:
-                    movieLogger.listMovies();
+                    addToDiary();
                     break;
-
                 case 3:
-                    movieLogger.displayRecord();
+                    addToWatchlist();
                     break;
-
                 case 4:
-                    System.out.println("Exiting the Movie App. Goodbye!");
-                    System.exit(0);
+                    viewShelf();
                     break;
-
+                case 5:
+                    viewDiary();
+                    break;
+                case 6:
+                    viewWatchlist();
+                    break;
+                case 7:
+                    System.out.println("Exiting the app. Goodbye!");
+                    System.exit(0);
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
-           
         }
     }
+
+    private void addToShelf() {
+        System.out.print("Enter movie name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter director: ");
+        String director = scanner.nextLine();
+
+        System.out.print("Enter release year: ");
+        int releaseYear = scanner.nextInt();
+        scanner.nextLine(); 
+
+        System.out.print("Enter your review: ");
+        String review = scanner.nextLine();
+
+        System.out.print("Enter your rating (out of 5): ");
+        int rating = scanner.nextInt();
+        scanner.nextLine(); 
+
+        Movie movie = new Movie(name, director, releaseYear, review, rating);
+        shelf.add(movie);
+
+        removeFromWatchlist(name, releaseYear);
+
+        System.out.println("Movie added to Shelf!");
+    }
+
+    private void addToDiary() {
+        System.out.print("Enter movie name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter release year: ");
+        int releaseYear = scanner.nextInt();
+        scanner.nextLine(); 
+
+        System.out.print("Enter your rating (out of 5): ");
+        int rating = scanner.nextInt();
+        scanner.nextLine(); 
+
+        System.out.print("Enter director: ");
+        String director = scanner.nextLine();
+
+        System.out.print("Enter your review: ");
+        String review = scanner.nextLine();
+
+        System.out.print("Enter the date (MM/dd/yyyy) you watched the movie: ");
+        String dateString = scanner.nextLine();
+        Date date;
+        try {
+            date = dateFormat.parse(dateString);
+        } catch (Exception e) {
+            System.out.println("Invalid date format. Using current date.");
+            date = new Date();
+        }
+
+        Movie movie = new Movie(name, director, releaseYear, review, rating);
+        diary.add(movie);
+
+        // Automatically add to Shelf
+        addToShelf(name, director, releaseYear, review, rating);
+
+        System.out.println("Movie added to Diary!");
+
+        // Remove from Watchlist if present
+        removeFromWatchlist(name, releaseYear);
+    }
+
+    private void addToWatchlist() {
+        System.out.print("Enter movie name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter release year: ");
+        int releaseYear = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        watchlist.add(name + " (" + releaseYear + ")");
+        watchlistIndexMap.put(name + " (" + releaseYear + ")", watchlist.size() - 1);
+
+        System.out.println("Movie added to Watchlist!");
+    }
+
+    private void removeFromWatchlist(String name, int releaseYear) {
+        String key = name + " (" + releaseYear + ")";
+        if (watchlistIndexMap.containsKey(key)) {
+            int index = watchlistIndexMap.get(key);
+            watchlist.remove(index);
+            watchlistIndexMap.remove(key);
+        }
+    }
+
+    private void viewShelf() {
+        System.out.println("\n--- Shelf ---");
+        for (Movie movie : shelf) {
+            System.out.println(movie.name + " (" + movie.releaseYear + ")");
+            System.out.println("Director: " + movie.director);
+            System.out.println("Rating: " + movie.rating + "/5");
+            System.out.println("Review: " + movie.review);
+            System.out.println();
+        }
+    }
+
+    private void viewDiary() {
+        System.out.println("\n--- Diary ---");
+        for (Movie movie : diary) {
+            System.out.println(movie.name + " (" + movie.releaseYear + ")");
+            System.out.println("Date Watched: " + dateFormat.format(new Date()));
+            System.out.println("Rating: " + movie.rating + "/5");
+            System.out.println();
+        }
+    }
+
+    private void viewWatchlist() {
+        System.out.println("\n--- Watchlist ---");
+        for (String movie : watchlist) {
+            System.out.println(movie);
+        }
+    }
+
+    private void addToShelf(String name, String director, int releaseYear, String review, int rating) {
+        Movie movie = new Movie(name, director, releaseYear, review, rating);
+        shelf.add(movie);
+    }
 }
+
+
