@@ -1,4 +1,4 @@
-MovieApp is a simple Java console application that allows you to manage, rate and review your favorite films.
+Showtime is a simple Java console application that allows you to manage, rate and review your favorite films.
 It provides features like adding films to the shelf, keep track of the films you've watched by logging them in a diary, and maintain a watchlist.
 
 --Features--
