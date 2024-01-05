@@ -1,0 +1,265 @@
+import javax.swing.*;
+import javax.swing.ImageIcon;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+class Movie {
+    String name;
+    String director;
+    int releaseYear;
+    String review;
+    int rating;
+
+    Movie(String name, String director, int releaseYear, String review, int rating) {
+        this.name = name;
+        this.director = director;
+        this.releaseYear = releaseYear;
+        this.review = review;
+        this.rating = rating;
+    }
+}
+
+class MovieAppGUI extends JFrame {
+    private ArrayList<Movie> shelf = new ArrayList<>();
+    private ArrayList<Movie> diary = new ArrayList<>();
+    private ArrayList<String> watchlist = new ArrayList<>();
+    private Map<String, Integer> watchlistIndexMap = new HashMap<>();
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    private JTextField movieNameField, directorField, releaseYearField, reviewField, ratingField, dateField;
+
+    public MovieAppGUI() {
+        super("Showtime");
+
+        ImageIcon icon = new ImageIcon(getClass().getResource("showtime.jpg"));
+        setIconImage(icon.getImage());
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridLayout(3, 2));
+
+        initUI();
+
+        setSize(400, 300);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void initUI() {
+        add(createButton("Add to Shelf", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addToShelf();
+            }
+        }));
+        add(createButton("Add to Diary", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addToDiary();
+            }
+        }));
+        add(createButton("Add to Watchlist", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addToWatchlist();
+            }
+        }));
+        add(createButton("View Shelf", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                viewShelf();
+            }
+        }));
+        add(createButton("View Diary", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                viewDiary();
+            }
+        }));
+        add(createButton("View Watchlist", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                viewWatchlist();
+            }
+        }));
+    }
+
+    private JButton createButton(String label, ActionListener listener) {
+        JButton button = new JButton(label);
+        button.addActionListener(listener);
+        return button;
+    }
+
+    private void addToShelf() {
+    SwingUtilities.invokeLater(() -> {
+        JPanel panel = new JPanel(new GridLayout(0, 2));
+        panel.add(new JLabel("Movie Name:"));
+        panel.add(movieNameField = new JTextField());
+        panel.add(new JLabel("Director:"));
+        panel.add(directorField = new JTextField());
+        panel.add(new JLabel("Release Year:"));
+        panel.add(releaseYearField = new JTextField());
+        panel.add(new JLabel("Review:"));
+        panel.add(reviewField = new JTextField());
+        panel.add(new JLabel("Rating:"));
+        panel.add(ratingField = new JTextField());
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Add to Shelf", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            String name = movieNameField.getText();
+            String director = directorField.getText();
+            int releaseYear = Integer.parseInt(releaseYearField.getText());
+            String review = reviewField.getText();
+            int rating = Integer.parseInt(ratingField.getText());
+
+            addToShelf(name, director, releaseYear, review, rating);
+
+            removeFromWatchlist(name, releaseYear);
+
+            JOptionPane.showMessageDialog(null, "Movie added to Shelf!");
+        }
+    });
+}
+
+
+    private void addToShelf(String name, String director, int releaseYear, String review, int rating) {
+        Movie movie = new Movie(name, director, releaseYear, review, rating);
+        shelf.add(movie);
+    }
+
+    private void addToDiary() {
+    SwingUtilities.invokeLater(() -> {
+        JPanel panel = new JPanel(new GridLayout(0, 2));
+        panel.add(new JLabel("Movie Name:"));
+        panel.add(movieNameField = new JTextField());
+        panel.add(new JLabel("Release Year:"));
+        panel.add(releaseYearField = new JTextField());
+        panel.add(new JLabel("Rating:"));
+        panel.add(ratingField = new JTextField());
+        panel.add(new JLabel("Director:"));
+        panel.add(directorField = new JTextField());
+        panel.add(new JLabel("Review:"));
+        panel.add(reviewField = new JTextField());
+        panel.add(new JLabel("Date (MM/dd/yyyy):"));
+        panel.add(dateField = new JTextField());
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Add to Diary", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            String name = movieNameField.getText();
+            int releaseYear = Integer.parseInt(releaseYearField.getText());
+            int rating = Integer.parseInt(ratingField.getText());
+            String director = directorField.getText();
+            String review = reviewField.getText();
+            String dateString = dateField.getText();
+
+            Date date;
+            try {
+                date = dateFormat.parse(dateString);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Invalid date format. Using current date.");
+                date = new Date();
+            }
+
+            Movie movie = new Movie(name, director, releaseYear, review, rating);
+            diary.add(movie);
+
+            addToShelf(name, director, releaseYear, review, rating);
+
+            JOptionPane.showMessageDialog(null, "Movie added to Diary!");
+
+            removeFromWatchlist(name, releaseYear);
+        }
+    });
+}
+
+    private void addToWatchlist() {
+    SwingUtilities.invokeLater(() -> {
+        JPanel panel = new JPanel(new GridLayout(0, 2));
+        panel.add(new JLabel("Movie Name:"));
+        panel.add(movieNameField = new JTextField());
+        panel.add(new JLabel("Release Year:"));
+        panel.add(releaseYearField = new JTextField());
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Add to Watchlist", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            String name = movieNameField.getText();
+            int releaseYear = Integer.parseInt(releaseYearField.getText());
+
+            watchlist.add(name + " (" + releaseYear + ")");
+            watchlistIndexMap.put(name + " (" + releaseYear + ")", watchlist.size() - 1);
+
+            JOptionPane.showMessageDialog(null, "Movie added to Watchlist!");
+        }
+    });
+}
+
+
+    
+
+    private void viewShelf() {
+        StringBuilder shelfText = new StringBuilder("--- Shelf ---\n");
+        for (Movie movie : shelf) {
+            shelfText.append(movie.name).append(" (").append(movie.releaseYear).append(")\n");
+            shelfText.append("Director: ").append(movie.director).append("\n");
+            shelfText.append("Rating: ").append(movie.rating).append("/5\n");
+            shelfText.append("Review: ").append(movie.review).append("\n\n");
+        }
+        JOptionPane.showMessageDialog(null, shelfText.toString());
+    }
+
+    private void viewDiary() {
+        StringBuilder diaryText = new StringBuilder("--- Diary ---\n");
+        for (Movie movie : diary) {
+            diaryText.append(movie.name).append(" (").append(movie.releaseYear).append(")\n");
+            diaryText.append("Date Watched: ").append(dateFormat.format(new Date())).append("\n");
+            diaryText.append("Rating: ").append(movie.rating).append("/5\n\n");
+        }
+        JOptionPane.showMessageDialog(null, diaryText.toString());
+    }
+
+    private void viewWatchlist() {
+        StringBuilder watchlistText = new StringBuilder("--- Watchlist ---\n");
+        for (String movie : watchlist) {
+            watchlistText.append(movie).append("\n");
+        }
+        JOptionPane.showMessageDialog(null, watchlistText.toString());
+    }
+
+    private void removeFromWatchlist(String name, int releaseYear) {
+        String key = name + " (" + releaseYear + ")";
+        if (watchlistIndexMap.containsKey(key)) {
+            int index = watchlistIndexMap.get(key);
+            watchlist.remove(index);
+            watchlistIndexMap.remove(key);
+        }
+    }
+
+    // private JFrame createInputFrame(String title, String... labels) {
+    //     JFrame inputFrame = new JFrame(title);
+    //     inputFrame.setLayout(new GridLayout(labels.length, 2));
+
+    //     movieNameField = new JTextField();
+    //     directorField = new JTextField();
+    //     releaseYearField = new JTextField();
+    //     reviewField = new JTextField();
+    //     ratingField = new JTextField();
+    //     dateField = new JTextField();
+
+    //     JTextField[] fields = {movieNameField, directorField, releaseYearField, reviewField, ratingField, dateField};
+
+    //     for (int i = 0; i < labels.length; i++) {
+    //         inputFrame.add(new JLabel(labels[i]));
+    //         inputFrame.add(fields[i]);
+    //     }
+
+    //     return inputFrame;
+    // }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new MovieAppGUI());
+    }
+}
