@@ -13,16 +13,24 @@ It provides features like adding films to the shelf, keep track of the films you
 
 ## Usage
 
-1. Run the `MovieApp` class.
+1. Run the `MovieAppGUI` class.
 2. Choose an option from the menu to perform the desired action.
 
-## Date Format
+## Notes
 
-The application uses the "MM/dd/yyyy" format for date input.
+Ensure correct input formats for dates (MM/dd/yyyy).
+Ratings are out of 5.
+Click "Cancel" to abort adding a movie.
+
+## Developer
+
+Developed by Akshay Kamble
+Contact: kambleakshay776@gmail.com
 
 ## Dependencies
 
-- Java SE Development Kit (JDK) 8 or later.
+Java SE Development Kit (JDK)
+Swing Library
 
 ## Contributing
 
